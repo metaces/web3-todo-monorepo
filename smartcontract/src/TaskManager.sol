@@ -14,7 +14,7 @@ contract TaskManager {
         string description;
         bool isCompleted;
         address owner;
-        uint256 reward; // Optional: reward for completing the task
+        uint256 stake;
     }
 
     // create a array to store tasks
@@ -37,7 +37,7 @@ contract TaskManager {
             description: _description,
             isCompleted: false,
             owner: msg.sender,
-            reward: msg.value // Optional: reward for completing the task, can be zero
+            stake: msg.value
         });
         tasks.push(newTask);
 
@@ -51,7 +51,7 @@ contract TaskManager {
             newTask.description,
             newTask.isCompleted,
             newTask.owner,
-            newTask.reward
+            newTask.stake
         );
     }
 
@@ -65,7 +65,7 @@ contract TaskManager {
         string description,
         bool isCompleted,
         address owner,
-        uint256 reward
+        uint256 stake
     );
 
     // create a function to get a task by id

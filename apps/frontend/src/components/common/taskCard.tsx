@@ -2,7 +2,6 @@ import { Badge } from "../ui/badge";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
 import { LockIcon, LockOpen } from "lucide-react";
-import { useMetaMask } from "@/hooks/useMetaMask";
 
 interface TaskCardProps {
   title: string;
@@ -13,9 +12,6 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ title, description, createdAt, dueDate, stake }: TaskCardProps) {
-
-  const {isConnected} = useMetaMask();
-
 
   const CloseIcon = () => (
     <Button
@@ -46,7 +42,6 @@ export function TaskCard({ title, description, createdAt, dueDate, stake }: Task
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="default">Pendente</Badge>
-            {isConnected ? <CheckIcon /> : <CloseIcon />}
         </div>
       </CardHeader>
       <CardContent>

@@ -27,7 +27,7 @@ contract TaskManagerTest is Test {
             "This is a test task", // description
             false, // isCompleted
             owner, // owner
-            0 // reward, optional, can be zero
+            0 // stake
         );
         taskManager.createTask("Test Task", "This is a test task", 0);
 
@@ -42,7 +42,7 @@ contract TaskManagerTest is Test {
         assertEq(task.description, "This is a test task");
         assertEq(task.isCompleted, false);
         assertEq(task.owner, owner);
-        assertEq(task.reward, 0); // reward should be zero since no ether was sent
+        assertEq(task.stake, 0); // reward should be zero since no ether was sent
     }
 
     // test if a task is completed successfully
@@ -61,7 +61,7 @@ contract TaskManagerTest is Test {
             "This is a test task", // description
             false, // isCompleted
             owner, // owner
-            0 // reward, optional, can be zero
+            0 // stake
         );
         taskManager.createTask("Test Task", "This is a test task", 0);
 

@@ -7,8 +7,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useMetaMask } from "@/hooks/useMetaMask";
-import { PlusIcon, WalletIcon } from "lucide-react";
+import { contractAbi, contractAddress } from "@/lib/abi";
+import { getWalletClient, publicClient } from "@/lib/client";
+import { Task } from "@/types/task";
+import { PlusIcon, WalletIcon, XIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Address, getContract } from "viem";
 
 const tasks = [
   {
@@ -37,25 +41,73 @@ const tasks = [
 
 export default function Home() {
 
-  const {isConnected, connect} = useMetaMask();
+  // UseState for account address of type Address from viem
+  const [accountAddress, setAccountAddress] = useState<Address>();
+  // UseState for contract 
+  const [contract, setContract] = useState<any>(null);
+  // UseState for array of type Task
+  const [tasks, setTasks] = useState<Task[]>([]);
+  
+  // UseEffect to initialize the contract
+  useEffect(() => {
+    const walletClient = getWalletClient();
+    if (walletClient) {
+      const contractInstance = getContract({
+        address: contractAddress,
+        abi: contractAbi,
+        client: { public: publicClient, wallet: walletClient },
+      });
+      setContract(contractInstance);
+      console.log("Wallet client initialized successfully.");
+    } else {
+      console.error("Failed to initialize wallet client.");
+    }
+  }, []);
+  // Function to connect to the MetaMask wallet
+  const connect = async () => {
+    try {
+      // Connect from getWalletClient from client.ts
+      const walletClient = await getWalletClient();
+      // Set the account address
+      const [address] = await (walletClient as any).requestAddresses();
+      setAccountAddress(address);
+      console.log("Connected to wallet:", address);
+    } catch (error) {
+      console.error("Failed to connect to wallet:", error);
+      alert("Failed to connect to wallet. Please try again.");
+    }
+  };
+
+  // Function to disconnect the wallet
+  const disconnect = async () => {
+    setAccountAddress(undefined);
+    console.log("Disconnected from wallet");
+    alert("Wallet disconnected.");
+  };
 
   return (
     <div className="flex flex-col min-h-screen max-w-7xl mx-auto">
       <div className="flex justify-between items-center p-4">
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-bold">Web3 Todo List</h1>
-          <h2 className="text-sm text-muted-foreground">Gerencie sua atividades</h2>
+          <p className="text-sm text-muted-foreground">A decentralized task management application</p>
+          <p className="text-sm text-muted-foreground">Powered by Ethereum and Viem</p>
         </div>
+        {!accountAddress? (
         <Button 
-          onClick={connect} 
-          className={!isConnected ? 'bg-orange-600 hover:bg-orange-700 text-white cursor-pointer' : 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'}
-          size="sm"
-          aria-label="MetaMask connection status">
+          onClick={connect}>
           <WalletIcon />
-          <span>
-              {!isConnected ? 'Connect Wallet ' : 'Wallet Connected' }
-          </span>
+          <span>Connect Wallet</span>
         </Button>
+        ) : (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-700">{accountAddress}</span>
+            <Button 
+              onClick={disconnect}>
+              <XIcon/>
+            </Button>
+          </div>
+        )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
         <StatusCard 
